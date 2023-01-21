@@ -3,7 +3,7 @@ import axios from "axios";
 import Item from "@/component/Item";
 import Head from "next/head";
 
-//server side rendering page
+//static page
 export default function Post({ item, name }: any) {
   return (
       <>  
@@ -23,7 +23,19 @@ export default function Post({ item, name }: any) {
     )
 };
 
-export async function getServerSideProps(context: any) {
+export async function getStaticPaths() {
+  return {
+    paths: [
+      { params: { id: "495"} },
+      { params: { id: "488"} },
+      { params: { id: "477"} },
+    ],
+    fallback: false 
+    //params에 없는 페이지가 있으면 서버에서 정적 페이지(static html)를 새로 생성한다.
+  };
+}
+
+export async function getStaticProps(context: any) {
   const id = context.params.id;
   const API_URI = process.env.NEXT_PUBLIC_API_KEY + `products/${id}.json` || "";
   const res = await axios.get(API_URI);

@@ -12,13 +12,21 @@ interface item {
 }
 
 export default function ItemList({ list }: any) {
+  //Link는 기본적으로 preFetch가 true로 설정되어있어 보이는 화면의 리소스를 미리 받아온다. 빌드후에 사용가능
+  //passHref href 속성을 하위 컴포넌트로 전달 검색엔진, 사용자 기능 최적화
+
     return (
       <>
         <Grid columns={3}>
           <Grid.Row >
             {list.map((item: item, index: number) => (
               <Grid.Column key={index}>
-                <Link href={"/view/[id]"} as={`/view/${item.id}`} >
+                <Link 
+                  href={"/detail/[id]"} 
+                  as={`/detail/${item.id}`}
+                  passHref
+                  prefetch={false} 
+                >
                 <div className={style.wrap}>
                   <Image 
                     className={style.img_item} 
