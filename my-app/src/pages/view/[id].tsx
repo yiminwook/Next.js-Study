@@ -1,41 +1,37 @@
 /* eslint-disable react-hooks/exhaustive-deps */
 import axios from "axios";
-import { useRouter } from "next/router";
-import { useEffect, useState } from "react";
 import Item from "@/component/Item";
-import { Loader } from "semantic-ui-react";
+import Head from "next/head";
 
-export default function Post() {
-  
-  const router = useRouter();
-  const { id } = router.query;
-  const API_URL = process.env.NEXT_PUBLIC_API_KEY + `products/${id}.json` || "";
-  const [item, setItem] = useState({});
-  const [isLoading, setIsLoading] = useState(false);
-
-  useEffect(() => {
-    if(id && +id > 0) {
-      setIsLoading(true);
-      axios.get(API_URL)
-      .then(res => {
-        setItem(res.data);
-        setIsLoading(false);
-      })
-      .catch(err => setIsLoading(false))
-    }
-  }, [id])
-
+export default function Post({ item, name }: any) {
+  console.log(name)
   return (
-      <>
-        {isLoading ? (
-          <div style={{ display: "absoulte", padding: "300px"}}>
-            <Loader inline="centered" active>
-              Loading
-            </Loader>
-          </div>
-        ) : (
-          <Item item={item} />
-          )}
+      <>  
+        {item && (
+          <>
+            <Head>
+              <title>{item.name}</title>
+              {/* 검색엔진 최적화, 항상 가격이나 상품설명이 최신화됌 */}
+              <meta name="description" content={item.description}></meta> 
+            </Head>
+            <Item item={item} />
+           </>
+        )}
       </> 
     )
 };
+
+export async function getServerSideProps(context: any) {
+  const id = context.params.id;
+  const API_URI = process.env.NEXT_PUBLIC_API_KEY + `products/${id}.json` || "";
+  const res = await axios.get(API_URI);
+  const data = res?.data;
+
+  return {
+    props: {
+      item: data,
+      //server쪽에서 동작하기 때문에 NEXT_PUBLIC_을 붙이지 않아도 된다.
+      name :process.env.name
+    }
+  };
+}

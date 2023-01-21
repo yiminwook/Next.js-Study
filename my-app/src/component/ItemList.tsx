@@ -18,7 +18,7 @@ export default function ItemList({ list }: any) {
           <Grid.Row >
             {list.map((item: item, index: number) => (
               <Grid.Column key={index}>
-                <Link href={`/view/${item.id}`}>
+                <Link href={"/view/[id]"} as={`/view/${item.id}`} >
                 <div className={style.wrap}>
                   <Image 
                     className={style.img_item} 
