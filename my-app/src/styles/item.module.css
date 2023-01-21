@@ -1,0 +1,62 @@
+.wrap {
+  padding: 10px;
+  display: grid;
+  grid-template-columns: 1fr 3fr;
+}
+
+.img_item {
+  margin-right: 30px;
+  width: 150px;
+}
+
+.info_item {
+  font-family: 'SoDo Sans SemiBold';
+  font-size: 20px;
+  display: grid;
+  grid-template-columns: 1fr;
+  height: 230px;
+  padding: 10px;
+  border-left: 1px solid rgba(0, 0, 0, 0.037);
+}
+
+.tit_item {
+  font-weight: 600;
+  display: inline-flex;
+}
+
+.num_price {
+  color: rgb(56, 223, 252);
+  font-size: 30px;
+}
+
+.txt_info {
+  padding-bottom: 30px;
+}
+
+.button_area {
+  text-align: center;
+  align-items: center;
+}
+
+.button_item {
+  background-color: rgb(255, 99, 27);
+  color: white;
+  width: 100px;
+  height: 40px;
+  font-weight: 800;
+  font-size: 16px;
+  border-radius: 10px 10px;
+  border:  0px;
+}
+
+.button_item:hover {
+  color: rgb(255, 99, 27);
+  background-color: white;
+  transition: 0.5s;
+  border: 2px solid rgb(255, 99, 27);
+}
+
+.item_desc {
+  padding-bottom: 30px;
+  font-size: 15px;
+}
