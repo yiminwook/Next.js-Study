@@ -20,6 +20,9 @@ export default function Home() {
         <li>
           <Link href='/sub/123'>/pages/sub/[id].tsx</Link>
         </li>
+        <li>
+          <Link href='/sub/fetch'>/pages/sub/fetch.tsx</Link>
+        </li>
       </ul>
     </div>
   )

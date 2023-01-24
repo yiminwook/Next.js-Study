@@ -7,7 +7,7 @@ export default function Id() {
   return (
     <>
       <h1>/pages/sub/[id].tsx</h1>
-      <p>Parameter id: {`${id}`}</p>
+      <p>Parameter id: {id}</p>
       <ul>
         <li>
           <Link href='/'>/pages/index.tsx</Link>
