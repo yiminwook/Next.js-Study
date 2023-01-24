@@ -4,6 +4,7 @@ import '@/styles/globals.css';
 
 import Footer from '@/component/Footer';
 import Top from '@/component/Top';
+import { Divider } from 'semantic-ui-react';
 
 /* App은 Global css, Layout를 잡는다. */
 export default function App({ Component, pageProps }: AppProps) {
@@ -11,6 +12,7 @@ export default function App({ Component, pageProps }: AppProps) {
     <div style={{ width: 700, margin: "0 auto" }}>
       <Top />
       <Component {...pageProps} />
+      <Divider />
       <Footer />
     </div>
   );

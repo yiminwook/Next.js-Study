@@ -7,14 +7,15 @@ export default function Gnb() {
   const router = useRouter();
 
   function goLink(e: any, data: any) {
-    console.log(data)
     setActiveItem(data.name);
     if (data.name === "home") {
-      router.push("./");
+      router.push("/");
     } else if (data.name === "About") {
-      router.push("./about");
+      router.push("/about");
     } else if (data.name === "Contact Us") {
-      router.push("./contact");
+      router.push("/contact");
+    } else if (data.name === "Admin") {
+      router.push("/admin");
     }
   }
 
@@ -33,6 +34,11 @@ export default function Gnb() {
     <Menu.Item
       name='Contact Us'
       active={activeItem === 'Contact Us'}
+      onClick={goLink}
+    />
+    <Menu.Item
+      name='Admin'
+      active={activeItem === 'Admin'}
       onClick={goLink}
     />
   </Menu>
