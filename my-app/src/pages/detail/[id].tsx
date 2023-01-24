@@ -2,9 +2,23 @@
 import axios from "axios";
 import Item from "@/component/Item";
 import Head from "next/head";
+import { useRouter } from "next/router";
+import { Loader } from "semantic-ui-react";
 
 //static page
 export default function Post({ item, name }: any) {
+  const router = useRouter();
+  if (router.isFallback) {
+    console.log("fallback!!");
+    return (
+      <div style={{ padding: "100px 0"}}>
+        <Loader active inline="centered">
+          Loading
+        </Loader>
+      </div>
+    );
+  }
+
   return (
       <>  
         {item && (
@@ -24,13 +38,19 @@ export default function Post({ item, name }: any) {
 };
 
 export async function getStaticPaths() {
+  const API_URL = process.env.API_KEY + "products.json?brand=maybelline" || "";
+  const res = await axios.get(API_URL);
+  const data = res?.data;
+
   return {
-    paths: [
-      { params: { id: "495"} },
-      { params: { id: "488"} },
-      { params: { id: "477"} },
-    ],
-    fallback: false 
+    paths: data.slice(0, 9).map((el: { id: string }) => {
+      return { 
+        params: {
+          id: el.id.toString(),
+        },
+      }
+    }),
+    fallback: true
     //params에 없는 페이지가 있으면 서버에서 정적 페이지(static html)를 새로 생성한다.
   };
 }
