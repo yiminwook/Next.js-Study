@@ -9,7 +9,7 @@ export default function useFirebaseAuth() {
 
   useEffect(() => {
     const unsubscribe = FirebaseClient.getInstance().Auth.onAuthStateChanged(authStateChanged);
-    /**언마운트될때 동작 **/
+    /** 언마운트될때 동작 **/
     return () => unsubscribe();
   }, []);
 
