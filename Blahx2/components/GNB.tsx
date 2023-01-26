@@ -12,7 +12,7 @@ const GNB = function () {
       fontSize="sm"
       fontWeight={600}
       color="white"
-      bg="pink.600"
+      bg="pink.400"
       _hover={{ bg: 'pink.300' }}
     >
       로그인
@@ -26,7 +26,7 @@ const GNB = function () {
   );
 
   return (
-    <Box>
+    <Box borderBottom={1} borderStyle="solid" borderColor="gray.200" bgColor="white">
       <Flex minH="60px" px={{ base: 4 }} py={{ base: 2 }} align="center" maxW="md" mx="auto">
         <Spacer />
         <Box flex="1">
