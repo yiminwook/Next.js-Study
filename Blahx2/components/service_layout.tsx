@@ -1,3 +1,4 @@
+/* eslint-disable react/jsx-props-no-spreading */
 import Head from 'next/head';
 import { Box, BoxProps } from '@chakra-ui/react';
 import GNB from './GNB';

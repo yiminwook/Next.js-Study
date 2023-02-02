@@ -11,7 +11,7 @@ const FirebaseCredentials = {
 };
 
 export default class FirebaseClient {
-  //private?
+  //private instance나 변수를 외부에서 접근하지 못하게 하는게 좋다.
   private static instance: FirebaseClient;
 
   private auth: Auth;

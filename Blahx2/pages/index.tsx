@@ -5,8 +5,7 @@ import { GooleLoginButton } from '@/components/google_login_button';
 import { useAuth } from '@/contexts/auth.user.context';
 
 const IndexPage: NextPage = function () {
-  const { signInWithGoogle, authUser } = useAuth();
-  console.log('userdata', authUser);
+  const { signInWithGoogle } = useAuth();
   return (
     <ServiceLayout title="test" minH="100vh" backgroundColor="gray.50">
       <Box maxW="md" mx="auto" pt="10">

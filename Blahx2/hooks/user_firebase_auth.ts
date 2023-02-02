@@ -1,5 +1,6 @@
 import { useEffect, useState } from 'react';
 import { GoogleAuthProvider, signInWithPopup, User } from 'firebase/auth';
+import axios from 'axios';
 import { InAuthUser } from '@/models/in_auth_user';
 import FirebaseClient from '@/models/firebase_client';
 
@@ -37,7 +38,18 @@ export default function useFirebaseAuth() {
     try {
       const signInResult = await signInWithPopup(FirebaseClient.getInstance().Auth, provider);
       if (signInResult.user) {
-        console.info(signInResult.user);
+        const { uid, photoURL, displayName, email } = signInResult.user;
+        console.log('test!1', uid, photoURL, displayName, email);
+        const apiResult = await axios.post('/api/members.add', {
+          headers: { 'Content-Type': 'application/json' },
+          data: {
+            uid,
+            photoURL,
+            displayName,
+            email,
+          },
+        });
+        console.log(apiResult);
       }
     } catch (err) {
       console.error(err);
