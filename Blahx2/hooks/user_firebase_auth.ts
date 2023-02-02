@@ -40,7 +40,7 @@ export default function useFirebaseAuth() {
       if (signInResult.user) {
         const { uid, photoURL, displayName, email } = signInResult.user;
         console.log('test!1', uid, photoURL, displayName, email);
-        const apiResult = await axios.post('/api/members.add', {
+        const apiResult = await axios.post('/api/member.add', {
           headers: { 'Content-Type': 'application/json' },
           data: {
             uid,
