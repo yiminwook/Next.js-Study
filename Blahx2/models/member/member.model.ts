@@ -9,7 +9,9 @@ async function add({ uid, email, displayName, photoURL }: InAuthUser): Promise<A
   try {
     const addResult = await FirebaseAdmin.getInstance().Firebase.runTransaction(async (transaction) => {
       //데이터베이스의 모든 변경사항을 한번에 처리하기 위해 transaction을 사용
-      const screenName = (displayName as string).replace('@gmail.com', '');
+      const screenName = email!.replace('@gmail.com', '');
+      //add()문서를 랜덤으로 생성
+      //doc()문서를 지정해서 생성
       const memberRef = FirebaseAdmin.getInstance().Firebase.collection(MEMBER_COL).doc(uid);
       const screenNameRef = FirebaseAdmin.getInstance().Firebase.collection(SCR_NAME_COL).doc(screenName);
       const memberDoc = await transaction.get(memberRef);
@@ -20,7 +22,7 @@ async function add({ uid, email, displayName, photoURL }: InAuthUser): Promise<A
       const addData = {
         uid,
         email,
-        //없는 정보는 ''로 대체한다.
+        //?? 앞에 오는 값이 null 또는 undefined이면 뒤에오는 값을, 아니면 null 또는 undefined을 반환
         displayName: displayName ?? '',
         photoURL: photoURL ?? '',
       };
@@ -38,8 +40,19 @@ async function add({ uid, email, displayName, photoURL }: InAuthUser): Promise<A
   }
 }
 
-const memberModel = {
+async function findByScreenName(screenName: string): Promise<InAuthUser | null> {
+  const memberRef = FirebaseAdmin.getInstance().Firebase.collection(SCR_NAME_COL).doc(screenName);
+  const memberDoc = await memberRef.get();
+  if (memberDoc.exists === false) {
+    return null;
+  }
+  const data = memberDoc.data() as InAuthUser;
+  return data;
+}
+
+const MemberModel = {
   add,
+  findByScreenName,
 };
 
-export default memberModel;
+export default MemberModel;
