@@ -7,13 +7,13 @@ const SCR_NAME_COL = 'screen_names';
 type AddResult = { result: true; id: string } | { result: false; message: string };
 async function add({ uid, email, displayName, photoURL }: InAuthUser): Promise<AddResult> {
   try {
-    const addResult = await FirebaseAdmin.getInstance().Firebase.runTransaction(async (transaction) => {
+    const addResult = await FirebaseAdmin.getInstance().Firestore.runTransaction(async (transaction) => {
       //데이터베이스의 모든 변경사항을 한번에 처리하기 위해 transaction을 사용
       const screenName = email!.replace('@gmail.com', '');
       //add()문서를 랜덤으로 생성
       //doc()문서를 지정해서 생성
-      const memberRef = FirebaseAdmin.getInstance().Firebase.collection(MEMBER_COL).doc(uid);
-      const screenNameRef = FirebaseAdmin.getInstance().Firebase.collection(SCR_NAME_COL).doc(screenName);
+      const memberRef = FirebaseAdmin.getInstance().Firestore.collection(MEMBER_COL).doc(uid);
+      const screenNameRef = FirebaseAdmin.getInstance().Firestore.collection(SCR_NAME_COL).doc(screenName);
       const memberDoc = await transaction.get(memberRef);
       if (memberDoc.exists) {
         //이미 데이터베이스에 있을때 추가 작업없이 바로리턴
@@ -41,7 +41,7 @@ async function add({ uid, email, displayName, photoURL }: InAuthUser): Promise<A
 }
 
 async function findByScreenName(screenName: string): Promise<InAuthUser | null> {
-  const memberRef = FirebaseAdmin.getInstance().Firebase.collection(SCR_NAME_COL).doc(screenName);
+  const memberRef = FirebaseAdmin.getInstance().Firestore.collection(SCR_NAME_COL).doc(screenName);
   const memberDoc = await memberRef.get();
   if (memberDoc.exists === false) {
     return null;

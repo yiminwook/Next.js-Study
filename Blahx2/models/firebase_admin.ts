@@ -46,8 +46,8 @@ export default class FirebaseAdmin {
     console.info('bootstrap firebase admin');
   }
 
-  /** firestore를 반환 **/
-  public get Firebase(): FirebaseFirestore.Firestore {
+  /** firestore를 반환 */
+  public get Firestore(): FirebaseFirestore.Firestore {
     if (this.init === false) {
       this.bootstrap();
     }
