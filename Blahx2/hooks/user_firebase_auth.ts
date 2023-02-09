@@ -39,8 +39,7 @@ export default function useFirebaseAuth() {
       const signInResult = await signInWithPopup(FirebaseClient.getInstance().Auth, provider);
       if (signInResult.user) {
         const { uid, photoURL, displayName, email } = signInResult.user;
-        console.log('test!1', uid, photoURL, displayName, email);
-        const apiResult = await axios.post('/api/member.add', {
+        await axios.post('/api/member.add', {
           headers: { 'Content-Type': 'application/json' },
           data: {
             uid,
@@ -49,7 +48,6 @@ export default function useFirebaseAuth() {
             email,
           },
         });
-        console.log(apiResult);
       }
     } catch (err) {
       console.error(err);

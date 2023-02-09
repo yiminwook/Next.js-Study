@@ -1,11 +1,38 @@
 import { firestore } from 'firebase-admin';
 import CustomServerError from '@/controllers/error/custom_server_error';
 import FirebaseAdmin from '../firebase_admin';
+import { InMessage, InMessageServer } from './in_message';
 
 const MEMBER_COL = 'members';
 const MSG_COL = 'messages';
-const SCR_NAME_COL = 'screen_names';
+// const SCR_NAME_COL = 'screen_names';
 const { Firestore } = FirebaseAdmin.getInstance();
+
+async function list({ uid }: { uid: string }) {
+  const memberRef = Firestore.collection(MEMBER_COL).doc(uid);
+  //작성자의 글목록을 가져옴
+  const listData = await Firestore.runTransaction(async (transaction) => {
+    const memberDoc = await transaction.get(memberRef);
+    if (memberDoc.exists === false) {
+      throw new CustomServerError({ statusCode: 400, message: '존재하지 않는 사용자' });
+    }
+    const messageCol = memberRef.collection(MSG_COL);
+    const messageColDoc = await transaction.get(messageCol);
+    const data = messageColDoc.docs.map((mv) => {
+      //omit 특정 속성을 제거한 타입
+      const docData = mv.data() as Omit<InMessageServer, 'id'>;
+      const returnData = {
+        ...docData,
+        id: mv.id,
+        createAt: docData.createAt.toDate().toISOString(),
+        replyAt: docData.replyAt ? docData.replyAt.toDate().toISOString() : undefined,
+      } as InMessage;
+      return returnData;
+    });
+    return data;
+  });
+  return listData;
+}
 
 async function post({
   uid,
@@ -46,6 +73,7 @@ async function post({
 
 const messageModel = {
   post,
+  list,
 };
 
 export default messageModel;

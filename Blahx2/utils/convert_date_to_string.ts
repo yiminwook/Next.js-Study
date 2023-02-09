@@ -11,7 +11,6 @@ function converDateToString(dateString: string): string {
   const hours = calDuration.hours();
   const minutes = calDuration.minutes();
   const seconds = calDuration.seconds();
-  console.log(years);
 
   if (
     years === 0 &&

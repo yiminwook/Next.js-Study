@@ -24,6 +24,42 @@ interface Props {
   userInfo: InAuthUser | null;
 }
 
+async function postMessage({
+  uid,
+  message,
+  author,
+}: {
+  uid: string;
+  message: string;
+  author?: { displayName: string; photoURL?: string };
+}) {
+  if (message.length <= 0) {
+    return {
+      result: false,
+      message: '메세지를 입력해주세요',
+    };
+  }
+  try {
+    await axios.post('api/messages.add', {
+      headers: { 'content-type': 'application.json' },
+      data: {
+        uid,
+        message,
+        author,
+      },
+    });
+    return {
+      result: true,
+    };
+  } catch (err) {
+    console.error(err);
+    return {
+      result: false,
+      message: '메세지 등록 실패',
+    };
+  }
+}
+
 const UserHomePage: NextPage<Props> = function ({ userInfo }) {
   const [message, setMessage] = useState('');
   const [isAnonymous, setAnonymous] = useState(true);
@@ -36,11 +72,11 @@ const UserHomePage: NextPage<Props> = function ({ userInfo }) {
   }
 
   return (
-    <ServiceLayout title="user home" minH="100vh" backgroundColor="gray.50">
+    <ServiceLayout title={`${userInfo.displayName ?? '유저'} 홈페이지`} minH="100vh" backgroundColor="gray.50">
       <Box maxW="md" mx="auto" pt="6">
         <Box borderWidth="1px" borderRadius="lg" overflow="hidden" mb="2" bg="white">
           <Flex p="6">
-            <Avatar size="lg" src={userInfo.photoURL ?? 'https://bit.ly/broken-link'} mr="2" />
+            <Avatar size="lg" src={userInfo.photoURL ?? '/user.png'} mr="2" />
             <Flex direction="column" justify="center">
               <Text fontSize="md">{userInfo.displayName}</Text>
               <Text fontSize="xs">{userInfo.email}</Text>
@@ -50,11 +86,7 @@ const UserHomePage: NextPage<Props> = function ({ userInfo }) {
 
         <Box borderWidth="1px" borderRadius="lg" overflow="hidden" mb="2" bg="white">
           <Flex align="center" p="2">
-            <Avatar
-              size="xs"
-              mr="2"
-              src={isAnonymous ? 'https://bit.ly/broken-link' : authUser?.photoURL ?? 'https://bit.ly/broken-link'}
-            />
+            <Avatar size="xs" mr="2" src={isAnonymous ? '/user.png' : authUser?.photoURL ?? '/user.png'} />
             <Textarea
               bg="gray.100"
               placeholder="무엇이 궁금한가요?"
@@ -85,6 +117,27 @@ const UserHomePage: NextPage<Props> = function ({ userInfo }) {
               colorScheme="yellow"
               variant="solid"
               size="sm"
+              onClick={async () => {
+                const postData: {
+                  uid: string;
+                  message: string;
+                  author?: {
+                    displayName: string;
+                    photoURL?: string;
+                  };
+                } = { uid: userInfo.uid, message };
+                if (isAnonymous === false) {
+                  postData.author = {
+                    displayName: authUser?.displayName ?? 'anonymous',
+                    photoURL: authUser?.photoURL ?? '/user.png',
+                  };
+                }
+                const messageResp = await postMessage(postData);
+                if (messageResp.result === false) {
+                  toast({ title: messageResp.message, position: 'top-right' });
+                }
+                setMessage('');
+              }}
             >
               등록
             </Button>
@@ -105,6 +158,7 @@ const UserHomePage: NextPage<Props> = function ({ userInfo }) {
                 setAnonymous(!isAnonymous);
               }}
             />
+            {/* switch의 id값을 참조 */}
             <FormLabel htmlFor="anonymous" mb="0" fontSize="xx-small">
               Anonymous
             </FormLabel>
@@ -143,7 +197,7 @@ const UserHomePage: NextPage<Props> = function ({ userInfo }) {
   );
 };
 
-export const getServerSideProps: GetServerSideProps = async ({ query }) => {
+export const getServerSideProps: GetServerSideProps<Props> = async ({ query }) => {
   const { screenName } = query;
   if (screenName === undefined) {
     return {
