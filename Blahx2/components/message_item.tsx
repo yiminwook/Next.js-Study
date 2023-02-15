@@ -16,10 +16,7 @@ const MessageItem = function ({ uid, displayName, isOwner, photoURL, item }: Pro
     <Box borderRadius="md" width="full" bg="white" boxShadow="md">
       <Box>
         <Flex pl="2" pt="2" alignItems="center">
-          <Avatar
-            size="xs"
-            src={item.author ? item.author.phtoURL ?? 'https://bit.ly/broken-link' : 'https://bit.ly/broken-link'}
-          />
+          <Avatar size="xs" src={item.author ? item.author.phtoURL ?? '/user.png' : '/user.png'} />
           <Text fontSize="xx-small" ml="1">
             {item.author ? item.author.displayName : 'anonymous'}
           </Text>
@@ -40,7 +37,7 @@ const MessageItem = function ({ uid, displayName, isOwner, photoURL, item }: Pro
             <Divider />
             <Box display="flex" mt="2">
               <Box pt="2">
-                <Avatar size="xs" mr="2" src={photoURL ?? 'https://bit.ly/broken-link'} />
+                <Avatar size="xs" mr="2" src={photoURL ?? '/user.png'} />
               </Box>
               <Box borderRadius="md" p="2" width="full" bg="gray.100">
                 <Flex alignItems="center">
@@ -60,7 +57,7 @@ const MessageItem = function ({ uid, displayName, isOwner, photoURL, item }: Pro
           <Box pt="2">
             <Divider />
             <Box display="flex" mt="2">
-              <Avatar size="xs" mr="2" src={photoURL ?? 'https://bit.ly/broken-link'} />
+              <Avatar size="xs" mr="2" src={photoURL ?? '/user.png'} />
               <Box mr="2" borderRadius="md" width="full" bg="gray.100">
                 <Textarea
                   border="none"
