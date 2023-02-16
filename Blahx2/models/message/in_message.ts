@@ -8,7 +8,7 @@ interface MessageBase {
   reply?: string;
   author?: {
     displayName: string;
-    phtoURL?: string;
+    photoURL?: string;
   };
 }
 

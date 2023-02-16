@@ -1,3 +1,4 @@
+/* eslint-disable react-hooks/exhaustive-deps */
 import { GetServerSideProps, NextPage } from 'next';
 import {
   Avatar,
@@ -12,9 +13,11 @@ import {
   useToast,
   VStack,
 } from '@chakra-ui/react';
+import { TriangleDownIcon } from '@chakra-ui/icons';
 import TextareaAutosize from 'react-textarea-autosize';
 import { useEffect, useState } from 'react';
 import axios, { AxiosResponse } from 'axios';
+// import { useQuery } from 'react-query';
 import { ServiceLayout } from '@/components/service_layout';
 import { useAuth } from '@/contexts/auth.user.context';
 import { InAuthUser } from '@/models/in_auth_user';
@@ -65,21 +68,54 @@ const UserHomePage: NextPage<Props> = function ({ userInfo }) {
   const [message, setMessage] = useState('');
   const [messageList, setMessageList] = useState<InMessage[]>([]);
   const [isAnonymous, setAnonymous] = useState(true);
+  const [page, setPage] = useState(1);
+  const [totalPages, setTotalPages] = useState(1);
   const toast = useToast();
   const { authUser } = useAuth();
+  // 리프레쉬 트리거
+  const [messageListFetchTrigger, setMessageListFetchTrigger] = useState(false);
+
   /** Get MessageList */
   async function getMessageList(uid: string) {
     try {
-      const result: AxiosResponse<InMessage[]> = await axios.get(`/api/messages.list?uid=${uid}`);
-      setMessageList(result.data);
+      const result: AxiosResponse<{
+        totalElements: number;
+        totalPages: number;
+        page: number;
+        size: number;
+        content: InMessage[];
+      }> = await axios.get(`/api/messages.list?uid=${uid}&page=${page}&size=3`);
+      setTotalPages(result.data.totalPages);
+      setMessageList((prev) => [...prev, ...result.data.content]);
     } catch (err) {
       console.error(err);
     }
   }
+  async function getMesaageInfo({ uid, messageId }: { uid: string; messageId: string }) {
+    try {
+      const result: AxiosResponse<InMessage> = await axios.get(`/api/messages.info?uid=${uid}&messageId=${messageId}`);
+      if (result.status === 200) {
+        //리스트가 바뀌면서 하위컴포넌트의 값도 새로 변경
+        setMessageList((prev) => {
+          const findIndex = prev.findIndex((fv) => fv.id === result.data.id);
+          if (findIndex >= 0) {
+            const updateArr = [...prev];
+            updateArr[findIndex] = result.data;
+            return updateArr;
+          }
+          //변경할 데이터를 찾을 수 없을땐, 이전값을 리턴
+          return prev;
+        });
+      }
+    } catch (err) {
+      console.log(err);
+    }
+  }
+
   useEffect(() => {
     if (userInfo === null) return;
     getMessageList(userInfo.uid);
-  }, [userInfo]);
+  }, [userInfo, messageListFetchTrigger, page]);
   if (userInfo === null) {
     //err 페이지
     return <p>사용자를 찾을 수 없습니다.</p>;
@@ -151,6 +187,8 @@ const UserHomePage: NextPage<Props> = function ({ userInfo }) {
                   toast({ title: messageResp.message, position: 'top-right' });
                 }
                 setMessage('');
+                // 리프레쉬
+                setMessageListFetchTrigger((prev) => !prev);
               }}
             >
               등록
@@ -187,9 +225,23 @@ const UserHomePage: NextPage<Props> = function ({ userInfo }) {
               isOwner={isOwner}
               photoURL={userInfo.photoURL ?? '/user.png'}
               item={messageData}
+              onSendComplete={() => {
+                getMesaageInfo({ uid: userInfo.uid, messageId: messageData.id });
+              }}
             />
           ))}
         </VStack>
+        {totalPages > page && (
+          <Button
+            leftIcon={<TriangleDownIcon />}
+            width="full"
+            mt="2"
+            fontSize="sm"
+            onClick={() => setPage((prev) => prev + 1)}
+          >
+            더보기
+          </Button>
+        )}
       </Box>
     </ServiceLayout>
   );

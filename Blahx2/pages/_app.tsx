@@ -6,11 +6,13 @@ import { AuthUserProvider } from '@/contexts/auth.user.context';
 
 const MyApp = function ({ Component, pageProps }: AppProps) {
   return (
+    // <QuerClientProvider client={}>
     <ChakraProvider>
       <AuthUserProvider>
         <Component {...pageProps} />
       </AuthUserProvider>
     </ChakraProvider>
+    // </QuerClientProvider>
   );
 };
 
