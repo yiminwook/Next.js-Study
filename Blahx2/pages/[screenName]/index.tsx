@@ -15,9 +15,9 @@ import {
 } from '@chakra-ui/react';
 import { TriangleDownIcon } from '@chakra-ui/icons';
 import TextareaAutosize from 'react-textarea-autosize';
-import { useEffect, useState } from 'react';
+import { useState } from 'react';
 import axios, { AxiosResponse } from 'axios';
-// import { useQuery } from 'react-query';
+import { useQuery } from 'react-query';
 import { ServiceLayout } from '@/components/service_layout';
 import { useAuth } from '@/contexts/auth.user.context';
 import { InAuthUser } from '@/models/in_auth_user';
@@ -75,22 +75,6 @@ const UserHomePage: NextPage<Props> = function ({ userInfo }) {
   // 리프레쉬 트리거
   const [messageListFetchTrigger, setMessageListFetchTrigger] = useState(false);
 
-  /** Get MessageList */
-  async function getMessageList(uid: string) {
-    try {
-      const result: AxiosResponse<{
-        totalElements: number;
-        totalPages: number;
-        page: number;
-        size: number;
-        content: InMessage[];
-      }> = await axios.get(`/api/messages.list?uid=${uid}&page=${page}&size=3`);
-      setTotalPages(result.data.totalPages);
-      setMessageList((prev) => [...prev, ...result.data.content]);
-    } catch (err) {
-      console.error(err);
-    }
-  }
   async function getMesaageInfo({ uid, messageId }: { uid: string; messageId: string }) {
     try {
       const result: AxiosResponse<InMessage> = await axios.get(`/api/messages.info?uid=${uid}&messageId=${messageId}`);
@@ -112,14 +96,37 @@ const UserHomePage: NextPage<Props> = function ({ userInfo }) {
     }
   }
 
-  useEffect(() => {
-    if (userInfo === null) return;
-    getMessageList(userInfo.uid);
-  }, [userInfo, messageListFetchTrigger, page]);
+  const messsageListQueryKey = ['messageList', userInfo?.uid, page, messageListFetchTrigger];
+  useQuery(
+    messsageListQueryKey,
+    async () =>
+      // eslint-disable-next-line no-return-await
+      await axios.get<{
+        totalElements: number;
+        totalPages: number;
+        page: number;
+        size: number;
+        content: InMessage[];
+      }>(`/api/messages.list?uid=${userInfo?.uid}&page=${page}&size=3`),
+    {
+      keepPreviousData: true, //기존데이터 유지
+      refetchOnWindowFocus: false,
+      onSuccess: (data) => {
+        setTotalPages(data.data.totalPages);
+        if (page === 1) {
+          setMessageList([...data.data.content]);
+          return;
+        }
+        setMessageList((prev) => [...prev, ...data.data.content]);
+      },
+    },
+  );
+
   if (userInfo === null) {
     //err 페이지
     return <p>사용자를 찾을 수 없습니다.</p>;
   }
+
   const isOwner = authUser !== null && authUser.uid === userInfo.uid;
   return (
     <ServiceLayout title={`${userInfo.displayName ?? '유저'} 홈페이지`} minH="100vh" backgroundColor="gray.50">
@@ -187,8 +194,11 @@ const UserHomePage: NextPage<Props> = function ({ userInfo }) {
                   toast({ title: messageResp.message, position: 'top-right' });
                 }
                 setMessage('');
-                // 리프레쉬
-                setMessageListFetchTrigger((prev) => !prev);
+                // 리프레쉬 글 작성하면 page를 1로 돌려 messageList를 다시 받아온다.
+                setPage(1);
+                setTimeout(() => {
+                  setMessageListFetchTrigger((prev) => !prev);
+                });
               }}
             >
               등록
