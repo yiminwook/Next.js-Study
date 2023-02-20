@@ -44,14 +44,15 @@ async function postMessage({
     };
   }
   try {
-    await axios.post('api/messages.add', {
-      headers: { 'content-type': 'application.json' },
-      data: {
+    await axios.post(
+      'api/messages.add',
+      {
         uid,
         message,
         author,
       },
-    });
+      { headers: { 'Content-type': 'application/json' } },
+    );
     return {
       result: true,
     };
@@ -74,7 +75,6 @@ const UserHomePage: NextPage<Props> = function ({ userInfo }) {
   const { authUser } = useAuth();
   // 리프레쉬 트리거
   const [messageListFetchTrigger, setMessageListFetchTrigger] = useState(false);
-
   async function getMesaageInfo({ uid, messageId }: { uid: string; messageId: string }) {
     try {
       const result: AxiosResponse<InMessage> = await axios.get(`/api/messages.info?uid=${uid}&messageId=${messageId}`);

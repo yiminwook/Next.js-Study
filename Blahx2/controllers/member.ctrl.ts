@@ -3,7 +3,7 @@ import MemberModel from '@/models/member/member.model';
 import BadReqError from './error/bad_request_error';
 
 async function add(req: NextApiRequest, res: NextApiResponse) {
-  const { uid, email, displayName, photoURL } = req.body.data;
+  const { uid, email, displayName, photoURL } = req.body;
   //ajv 라이브러리로 검증이 가능함
   if (uid === undefined || uid === null) {
     throw new BadReqError('uid가 누락되었습니다.');

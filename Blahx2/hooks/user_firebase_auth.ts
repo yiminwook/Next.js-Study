@@ -15,7 +15,6 @@ export default function useFirebaseAuth() {
   }, []);
 
   async function authStateChanged(authState: User | null) {
-    console.log('언마운트');
     if (authState === null) {
       setAuthUser(null);
       setLoading(false);
@@ -39,15 +38,16 @@ export default function useFirebaseAuth() {
       const signInResult = await signInWithPopup(FirebaseClient.getInstance().Auth, provider);
       if (signInResult.user) {
         const { uid, photoURL, displayName, email } = signInResult.user;
-        await axios.post('/api/member.add', {
-          headers: { 'Content-Type': 'application/json' },
-          data: {
+        await axios.post(
+          '/api/member.add',
+          {
             uid,
             photoURL,
             displayName,
             email,
           },
-        });
+          { headers: { 'Content-Type': 'application/json' } },
+        );
       }
     } catch (err) {
       console.error(err);
