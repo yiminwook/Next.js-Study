@@ -24,19 +24,20 @@ import FirebaseClient from '@/models/firebase_client';
 
 interface Props {
   uid: string;
+  screenName: string;
   displayName: string;
   photoURL: string;
   isOwner: boolean;
   item: InMessage;
   onSendComplete: () => void;
 }
-const MessageItem = function ({ uid, displayName, isOwner, photoURL, item, onSendComplete }: Props) {
+const MessageItem = function ({ uid, screenName, displayName, isOwner, photoURL, item, onSendComplete }: Props) {
   const [reply, setReply] = useState('');
   const toast = useToast();
 
   async function postReply() {
     const result = await axios.post(
-      'api/messages.add.reply',
+      '/api/messages.add.reply',
       {
         uid,
         messageId: item.id,
@@ -60,7 +61,7 @@ const MessageItem = function ({ uid, displayName, isOwner, photoURL, item, onSen
       return;
     }
     const result: AxiosResponse<InMessage> = await axios.put(
-      'api/messages.deny',
+      '/api/messages.deny',
       {
         uid,
         messageId: item.id,
@@ -107,6 +108,13 @@ const MessageItem = function ({ uid, displayName, isOwner, photoURL, item, onSen
               <MenuList>
                 <MenuItem onClick={() => updateMessage({ deny: item.deny !== undefined ? !item.deny : true })}>
                   {isDeny ? '비공개처리 해제' : '비공개처리'}
+                </MenuItem>
+                <MenuItem
+                  onClick={() => {
+                    window.location.href = `/${screenName}/${item.id}`;
+                  }}
+                >
+                  메세지 상세보기
                 </MenuItem>
               </MenuList>
             </Menu>

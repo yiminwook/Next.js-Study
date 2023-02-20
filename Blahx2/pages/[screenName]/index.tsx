@@ -26,6 +26,7 @@ import { InMessage } from '@/models/message/in_message';
 
 interface Props {
   userInfo: InAuthUser | null;
+  screenName: string | undefined;
 }
 
 async function postMessage({
@@ -45,7 +46,7 @@ async function postMessage({
   }
   try {
     await axios.post(
-      'api/messages.add',
+      '/api/messages.add',
       {
         uid,
         message,
@@ -65,7 +66,7 @@ async function postMessage({
   }
 }
 
-const UserHomePage: NextPage<Props> = function ({ userInfo }) {
+const UserHomePage: NextPage<Props> = function ({ userInfo, screenName }) {
   const [message, setMessage] = useState('');
   const [messageList, setMessageList] = useState<InMessage[]>([]);
   const [isAnonymous, setAnonymous] = useState(true);
@@ -122,7 +123,7 @@ const UserHomePage: NextPage<Props> = function ({ userInfo }) {
     },
   );
 
-  if (userInfo === null) {
+  if (userInfo === null || screenName === undefined) {
     //err 페이지
     return <p>사용자를 찾을 수 없습니다.</p>;
   }
@@ -231,6 +232,7 @@ const UserHomePage: NextPage<Props> = function ({ userInfo }) {
             <MessageItem
               key={`message-item-${userInfo.uid}-${messageData.id}`}
               uid={userInfo.uid}
+              screenName={screenName}
               displayName={userInfo.displayName ?? ''}
               isOwner={isOwner}
               photoURL={userInfo.photoURL ?? '/user.png'}
@@ -259,10 +261,12 @@ const UserHomePage: NextPage<Props> = function ({ userInfo }) {
 
 export const getServerSideProps: GetServerSideProps<Props> = async ({ query }) => {
   const { screenName } = query;
+  const name = Array.isArray(screenName) ? screenName[0] : screenName;
   if (screenName === undefined) {
     return {
       props: {
         userInfo: null,
+        screenName: name,
       },
     };
   }
@@ -271,10 +275,11 @@ export const getServerSideProps: GetServerSideProps<Props> = async ({ query }) =
     const host = process.env.HOST || 'localhost';
     const port = process.env.PORT || '3000';
     const baseUrl = `${protocol}://${host}:${port}`;
-    const userInfoResp: AxiosResponse<InAuthUser> = await axios.get(`${baseUrl}/api/user.info/${screenName}`);
+    const userInfoResp: AxiosResponse<InAuthUser> = await axios.get(`${baseUrl}/api/user.info/${name}`);
     return {
       props: {
         userInfo: userInfoResp?.data ?? null,
+        screenName: name,
       },
     };
   } catch (err) {
@@ -282,6 +287,7 @@ export const getServerSideProps: GetServerSideProps<Props> = async ({ query }) =
     return {
       props: {
         userInfo: null,
+        screenName: name,
       },
     };
   }
