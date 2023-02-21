@@ -141,7 +141,6 @@ const UserHomePage: NextPage<Props> = function ({ userInfo, screenName }) {
             </Flex>
           </Flex>
         </Box>
-
         <Box borderWidth="1px" borderRadius="lg" overflow="hidden" mb="2" bg="white">
           <Flex align="center" p="2">
             <Avatar size="xs" mr="2" src={isAnonymous ? '/user.png' : authUser?.photoURL ?? '/user.png'} />
@@ -271,7 +270,7 @@ export const getServerSideProps: GetServerSideProps<Props> = async ({ query }) =
     };
   }
   try {
-    const protocol = process.env.PROTOCOL || ' http';
+    const protocol = process.env.PROTOCOL || 'http';
     const host = process.env.HOST || 'localhost';
     const port = process.env.PORT || '3000';
     const baseUrl = `${protocol}://${host}:${port}`;
